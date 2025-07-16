@@ -44,6 +44,7 @@ You do not need to add the :urioption:`tls=true <tls>` option to a
 ``mongodb+srv`` connection string. For example:
 
 .. code-block:: shell
+   :copyable: false
 
    mongosync \
       --cluster0 "mongodb+srv://clusterAdmin:superSecret@clusterOne01.fancyCorp.com/" \
