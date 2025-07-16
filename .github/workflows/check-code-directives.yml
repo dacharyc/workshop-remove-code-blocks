@@ -31,13 +31,22 @@ jobs:
           # Define the checkbox item you're looking for
           checkbox_text="This PR contains automated content generated from external sources"
         
-          # Check if the checkbox is present and is unchecked (i.e., it should be listed as '- [ ]' not '- [x]')  
-          if echo "$pr_body" | grep -q "\- \[ \] $checkbox_text"; then
-            echo "PR does not contain automatically generated content. Searching for deprecated code block directives."
-            echo "CONTAINS_AUTOMATED_CONTENT=false" >> $GITHUB_ENV
+          # Check if the checkbox text exists in the PR body
+          if echo "$pr_body" | grep -q "$checkbox_text"; then
+            # Checkbox text is present, check for its state (unchecked or checked)  
+            if echo "$pr_body" | grep -q "\- \[ \] $checkbox_text"; then
+              # Checkbox is explicitly unchecked
+              echo "PR does not contain automatically generated content. Searching for deprecated code block directives."
+              echo "CONTAINS_AUTOMATED_CONTENT=false" >> $GITHUB_ENV
+            else
+              # Checkbox is present but checked
+              echo "PR contains automated content. Skipping check for code-block and code directives."
+              echo "CONTAINS_AUTOMATED_CONTENT=true" >> $GITHUB_ENV
+            fi
           else
-            echo "PR contains automated content. Skipping check for code-block and code directives."  
-            echo "CONTAINS_AUTOMATED_CONTENT=true" >> $GITHUB_ENV
+            # Checkbox text is absent
+            echo "Checkbox text is not found in the PR description. Treating as no automated content."
+            echo "CONTAINS_AUTOMATED_CONTENT=false" >> $GITHUB_ENV
           fi
       - name: Search for deprecated directives
         shell: bash {0}
