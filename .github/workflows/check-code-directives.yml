@@ -63,8 +63,8 @@ jobs:
             if [[ "$line" =~ ^\+\+\+ ]]; then
               # Extract the current filename
               current_filename=$(echo "$line" | sed "s/^+++ b\///")
-              # Check if the filename contains 'after/source/' and reset counters if true
-              if [[ "$current_filename" == *after/source/* ]]; then
+              # Check if the filename contains '/source/' and reset counters if true
+              if [[ "$current_filename" == */source/* ]]; then
                 # If the current file has counts from previous file, print the errors before resetting
                 if [ "$current_filename" != "" ] && ([ $code_block_counter -gt 0 ] || [ $code_counter -gt 0 ]); then
                   errors="yes"
@@ -84,8 +84,8 @@ jobs:
                 current_filename=""
               fi
             fi
-            # When filename is valid and contains 'after/source/', check the diff changes
-            if [[ "$current_filename" == *after/source/* ]] && [[ "$line" =~ ^\+ && ! "$line" =~ ^\+\+\+ ]]; then
+            # When filename is valid and contains '/source/', check the diff changes
+            if [[ "$current_filename" == */source/* ]] && [[ "$line" =~ ^\+ && ! "$line" =~ ^\+\+\+ ]]; then
               if echo "$line" | grep -q '.. code-block::'; then
                 ((code_block_counter++))
               fi
@@ -95,7 +95,7 @@ jobs:
             fi
           done <<< "$diff_lines"
           # After processing all lines, check and print the final file's error if necessary
-          if [[ "$current_filename" == *after/source/* ]] && ([ $code_block_counter -gt 0 ] || [ $code_counter -gt 0 ]); then
+          if [[ "$current_filename" == */source/* ]] && ([ $code_block_counter -gt 0 ] || [ $code_counter -gt 0 ]); then
             errors="yes"
             echo "$current_filename contains unsupported code block directives"
             if [ $code_block_counter -gt 0 ]; then
